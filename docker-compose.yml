@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  db:
+    image: writeonce-api
+    container_name: writeonce-api-container
+    ports:
+      - 5050:8080
+    restart: unless-stopped
+    networks:
+      appNetwork:
+        ipv4_address: 18.5.0.4
+networks:
+  appNetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 18.5.0.0/16
+          gateway: 18.5.0.1
