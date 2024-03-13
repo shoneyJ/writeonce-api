@@ -1,0 +1,6 @@
+@writeonce_fe.Server_HostAddress = http://localhost:5211
+
+GET {{writeonce_fe.Server_HostAddress}}/api/v1.0/weatherforecast/
+Accept: application/json
+
+###
