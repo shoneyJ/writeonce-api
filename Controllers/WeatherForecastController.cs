@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace writeonce_fe.Server.Controllers
+namespace writeonceApi.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]

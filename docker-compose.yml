@@ -1,6 +1,7 @@
 version: "3.9"
 services:
-  db:
+  api:
+    build: .
     image: writeonce-api
     container_name: writeonce-api-container
     ports:

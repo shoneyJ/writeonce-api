@@ -1,5 +1,6 @@
-namespace writeonce_fe.Server
+namespace writeonceApi
 {
+
     public class WeatherForecast
     {
         public DateOnly Date { get; set; }
