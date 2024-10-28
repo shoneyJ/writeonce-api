@@ -1,0 +1,23 @@
+services:
+ 
+  writeonce-manage-article-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        AWS_INFRA_BASE_URL: ${AWS_INFRA_BASE_URL}      
+        API_ACCESS_TOKEN: ${API_ACCESS_TOKEN}
+    container_name: writeonce-manage-article-api
+    ports:
+      - ${PORT}:${PORT}    
+    environment:
+      - AWS_INFRA_BASE_URL=${AWS_INFRA_BASE_URL}    
+      - PORT=${PORT}
+      - API_ACCESS_TOKEN=${API_ACCESS_TOKEN}  
+    restart: always 
+    networks:
+      - writeonce-network
+
+networks:
+  writeonce-network:
+    external: true
