@@ -7,13 +7,16 @@ services:
       args:
         AWS_INFRA_BASE_URL: ${AWS_INFRA_BASE_URL}      
         API_ACCESS_TOKEN: ${API_ACCESS_TOKEN}
+        DATABASE_URL: ${DATABASE_URL}
+
     container_name: writeonce-manage-article-api
     ports:
       - ${PORT}:${PORT}    
     environment:
       - AWS_INFRA_BASE_URL=${AWS_INFRA_BASE_URL}    
       - PORT=${PORT}
-      - API_ACCESS_TOKEN=${API_ACCESS_TOKEN}  
+      - API_ACCESS_TOKEN=${API_ACCESS_TOKEN}
+      - DATABASE_URL:${DATABASE_URL}  
     restart: always 
     networks:
       - writeonce-network
