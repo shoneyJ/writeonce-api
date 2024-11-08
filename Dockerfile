@@ -1,8 +1,11 @@
 # Stage 1: Build the Rust application
-FROM rust:latest as builder
+FROM rust:1.82.0 AS builder
+WORKDIR /usr/src/app
 
 ARG PORT
 ARG AWS_INFRA_BASE_URL
+ARG DATABASE_URL
+ARG API_ACCESS_TOKEN
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -17,19 +20,13 @@ RUN apt-get update && apt-get install -y \
 RUN cargo install sccache
 ENV RUSTC_WRAPPER="sccache"
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
 
 # Cache dependencies to speed up builds
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 RUN mkdir src && echo "fn main() {}" > src/main.rs
 RUN cargo build --release && rm -rf target/release/deps/*
 
-# Copy the entire project into the container
 COPY . .
-
-# Build the application in release mode
-# RUN cargo install --path .
 
 RUN cargo build --release
 
@@ -40,6 +37,7 @@ FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libc6 \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -49,6 +47,7 @@ COPY --from=builder /usr/src/app/target/release/writeonce-manage-article-api /us
 ENV PORT=$PORT
 ENV AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL
 ENV API_ACCESS_TOKEN=$API_ACCESS_TOKEN
+ENV DATABASE_URL=$DATABASE_URL
 
 # Expose the application port
 EXPOSE ${PORT}

@@ -35,5 +35,4 @@ target/
 
 # Diesel CLI generated schema.rs
 diesel.toml
-src/schema.rs
 **/migrations/**/diesel_schema.lock
