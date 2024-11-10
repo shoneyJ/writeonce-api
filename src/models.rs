@@ -67,9 +67,15 @@ impl Article {
         let conn = &mut db::connection()?;
         let article = insert_into(articles::table)
         .values(&new_article)
-        .on_conflict(articles::id)
+        .on_conflict(articles::dsl::id)
         .do_update()
-        .set(&new_article)
+        .set((
+            articles::title.eq(&new_article.title),
+            articles::sys_title.eq(&new_article.sys_title),
+            articles::published.eq(new_article.published),
+            articles::content.eq(new_article.content.clone()),
+            articles::do_aws_sync.eq(new_article.do_aws_sync),
+        ))
         .get_result(conn)?;
 
         Ok(article)
