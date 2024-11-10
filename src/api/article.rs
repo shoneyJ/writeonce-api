@@ -1,4 +1,4 @@
-use actix_web::{get,post,web, HttpResponse,HttpRequest, Responder};
+use actix_web::{get,post,delete,web, HttpResponse,HttpRequest, Responder};
 use crate::models::*;
 use crate::api::valid;
 use crate::services::aws::get_s3_article;
@@ -10,6 +10,25 @@ pub async fn get_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Res
     }
 
     match Article::find(id.into_inner()) {
+        Ok(article) => {
+            // Return the article in the response
+            HttpResponse::Ok().json(article)
+        },
+        Err(_) => {
+            // Handle the case when the article is not found
+            HttpResponse::NotFound().body("Article not found")
+        }
+    }
+
+}
+
+#[delete("/article/{id}")]
+pub async fn remove_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Responder {
+    if let Err(response) = valid::validate_token(&req).await {
+        return response; // Return Unauthorized response
+    }
+
+    match Article::remove(id.into_inner()) {
         Ok(article) => {
             // Return the article in the response
             HttpResponse::Ok().json(article)

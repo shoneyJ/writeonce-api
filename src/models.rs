@@ -1,4 +1,4 @@
-use diesel::{dsl::count_star, prelude::*};
+use diesel::{dsl::{count_star, delete}, prelude::*};
 use crate::error_handler::CustomError;
 use crate::schema::articles;
 use crate::db;
@@ -43,12 +43,24 @@ pub struct CountResponse {
     count: i64,
 }
 
+#[derive(Serialize)]
+pub struct RemoveResponse {
+    msg: String,
+}
+
 impl Article {
 
     pub fn find(_id: i32) -> Result<Self, CustomError> {
         let mut conn = db::connection()?;
         let article = articles::table.filter(articles::id.eq(_id)).first(&mut conn)?;
         Ok(article)
+    }
+
+    pub fn remove(_id: i32) -> Result<RemoveResponse, CustomError> {
+        let mut conn = db::connection()?;
+        let _ = delete(articles::dsl::articles.filter(articles::id.eq(_id))).execute(&mut conn);
+        let response = RemoveResponse { msg: "removed article".to_string() };
+        Ok(response)
     }
 
     pub fn upsert(new_article: NewArticle)  -> Result<Self, CustomError> {
