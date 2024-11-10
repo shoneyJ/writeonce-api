@@ -38,6 +38,11 @@ pub struct ArticleContent {
     pub content: Option<Value>
 }
 
+#[derive(Serialize)]
+pub struct CountResponse {
+    count: i64,
+}
+
 impl Article {
 
     pub fn find(_id: i32) -> Result<Self, CustomError> {
@@ -58,14 +63,16 @@ impl Article {
         Ok(article)
 
     }
-    pub fn get_total_articles_count() -> Result<i64, CustomError> {
+    pub fn get_total_articles_count() -> Result<CountResponse, CustomError> {
         let conn = &mut db::connection()?;
         
         let total_count = articles::table
             .select(count_star()) // Use count_star to count all rows
             .first::<i64>(conn)?;
+
+            let response = CountResponse { count: total_count };
     
-        Ok(total_count)
+        Ok(response)
     }
 
     pub fn get_articles_pagination(skip: i64, limit: i64) -> Result<Vec<ArticleContent>, CustomError> {
