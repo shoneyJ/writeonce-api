@@ -10,7 +10,7 @@ pub async fn get_s3_article(sys_title: String) -> Result<Value, CustomError> {
     let base_url = Url::parse(&aws_url).unwrap();
 
     let token = config::get_api_access_token();
-    let url = base_url.join(&format!("/assests/{}", sys_title)).unwrap();
+    let url = base_url.join(&format!("/article/{}", sys_title)).unwrap();
 
     let response = client
     .get(url)
