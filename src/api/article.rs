@@ -22,7 +22,7 @@ pub async fn get_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Res
 
 }
 
-#[get("/article/{sys_title}")]
+#[get("/article/title/{sys_title}")]
 pub async fn get_article_by_title( req: HttpRequest,sys_title: web::Path<String>) -> impl Responder {
     if let Err(response) = valid::validate_token(&req).await {
         return response; // Return Unauthorized response
