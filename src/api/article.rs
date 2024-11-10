@@ -22,6 +22,25 @@ pub async fn get_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Res
 
 }
 
+#[get("/article/{sys_title}")]
+pub async fn get_article_by_title( req: HttpRequest,sys_title: web::Path<String>) -> impl Responder {
+    if let Err(response) = valid::validate_token(&req).await {
+        return response; // Return Unauthorized response
+    }
+
+    match Article::get_article_by_title(sys_title.into_inner()) {
+        Ok(article) => {
+            // Return the article in the response
+            HttpResponse::Ok().json(article)
+        },
+        Err(_) => {
+            // Handle the case when the article is not found
+            HttpResponse::NotFound().body("Article not found")
+        }
+    }
+
+}
+
 #[get("/articles/count")]
 pub async fn get_articles_total_count (req: HttpRequest) -> impl Responder {
 

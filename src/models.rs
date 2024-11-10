@@ -87,4 +87,11 @@ impl Article {
         Ok(results)
     }
 
+    pub fn get_article_by_title(sys_title: String) -> Result<Self, CustomError> {
+
+        let mut conn = db::connection()?;
+        let article = articles::table.filter(articles::sys_title.eq(sys_title)).first(&mut conn)?;
+        Ok(article)
+     }
+
 }
