@@ -16,7 +16,7 @@ pub struct NewArticle {
     pub do_aws_sync: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize,Queryable, Selectable)]
+#[derive(Serialize, Deserialize,Queryable,AsChangeset, Selectable)]
 #[diesel(table_name = articles)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Article {
