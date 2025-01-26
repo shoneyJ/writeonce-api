@@ -5,8 +5,9 @@ use crate::db;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use diesel::insert_into;
+use chrono::Utc;
 
-#[derive(Serialize, Deserialize, AsChangeset, Insertable)]
+#[derive(Serialize, Deserialize,Queryable, AsChangeset, Insertable)]
 #[diesel(table_name = articles)]
 pub struct NewArticle {
     pub title: String,
@@ -14,6 +15,7 @@ pub struct NewArticle {
     pub published: bool,
     pub content: Option<Value>,
     pub do_aws_sync: Option<bool>,
+    pub published_on: Option<i64>,
 }
 
 #[derive(Serialize, Deserialize,Queryable,AsChangeset, Selectable)]
@@ -26,6 +28,7 @@ pub struct Article {
     pub published: bool,
     pub content: Option<Value>,
     pub do_aws_sync: Option<bool>,
+    pub published_on: Option<i64>,
 }
 
 #[derive(Serialize, Deserialize,Queryable, Selectable)]
@@ -48,6 +51,23 @@ pub struct RemoveResponse {
     msg: String,
 }
 
+impl  NewArticle {
+
+    fn new(data: NewArticle) -> Self {
+        let now_utc = Utc::now();
+        let cet_offset = chrono::FixedOffset::east_opt(1 * 3600).unwrap(); // +1 hour for CET     
+        let now_cet = now_utc.with_timezone(&cet_offset);
+        let  unix_timestamp_cet = now_cet.timestamp();
+
+        Self {
+            published_on : Some(unix_timestamp_cet),
+            ..data
+        }
+
+    }
+    
+}
+
 impl Article {
 
     pub fn find(_id: i32) -> Result<Self, CustomError> {
@@ -65,16 +85,20 @@ impl Article {
 
     pub fn upsert(new_article: NewArticle)  -> Result<Self, CustomError> {
         let conn = &mut db::connection()?;
+       
+         // Convert to CET by specifying the timezone offset (+1 hour)
+        let insert_article = NewArticle::new(new_article);
         let article = insert_into(articles::table)
-        .values(&new_article)
-        .on_conflict(articles::dsl::id)
+        .values(&insert_article)
+        .on_conflict(articles::dsl::sys_title)
         .do_update()
         .set((
-            articles::title.eq(&new_article.title),
-            articles::sys_title.eq(&new_article.sys_title),
-            articles::published.eq(new_article.published),
-            articles::content.eq(new_article.content.clone()),
-            articles::do_aws_sync.eq(new_article.do_aws_sync),
+            articles::title.eq(&insert_article.title),
+            articles::sys_title.eq(&insert_article.sys_title),
+            articles::published.eq(insert_article.published),
+            articles::content.eq(insert_article.content.clone()),
+            articles::published_on.eq(insert_article.published_on),
+            articles::do_aws_sync.eq(insert_article.do_aws_sync),
         ))
         .get_result(conn)?;
 
