@@ -52,7 +52,7 @@ deploy:
       --name \"$CI_PROJECT_NAME-container\" \
       --restart always \
       --network writeonce-network \
-      $IMAGE_NAME\"
+      \"$IMAGE_NAME\""
     - ssh-agent -k
   only:
     - main
