@@ -49,7 +49,9 @@ deploy:
           -e API_ACCESS_TOKEN=\"$API_ACCESS_TOKEN\" \
           -e DATABASE_URL=\"$DATABASE_URL\" \
           --name \"$CI_PROJECT_NAME\"-container \
-          \"$IMAGE_NAME\"' 
+          --restart always \
+          --network writeonce-network \
+          \"$IMAGE_NAME\" " 
     - ssh-agent -k
   only:
     - main
