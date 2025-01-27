@@ -44,7 +44,7 @@ deploy:
   script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de 'docker pull $IMAGE_NAME'
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker pull \"$IMAGE_NAME\""
     - ssh-agent -k
   only:
     - main
