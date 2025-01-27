@@ -44,18 +44,19 @@ deploy:
 
   script:
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker pull \"$IMAGE_NAME\""
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker stop $CONTAINER_NAME"
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker rm $CONTAINER_NAME"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker ps -q -f name=\"$CONTAINER_NAME\" | grep -q . && docker stop $CONTAINER_NAME"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker ps -a -q -f name=\"$CONTAINER_NAME\" | grep -q .&& docker rm $CONTAINER_NAME"
     - echo "docker run -d \
       -e AWS_INFRA_BASE_URL=\"$AWS_INFRA_BASE_URL\" \
       -e PORT=\"$API_PORT\" \
       -e API_ACCESS_TOKEN=\"$API_ACCESS_TOKEN\" \
       -e DATABASE_URL= \
+      -p $API_PORT:$API_PORT
       --name \"$CI_PROJECT_NAME-container\" \
       --restart always \
       --network writeonce-network \
        $IMAGE_NAME"
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker run -d -e AWS_INFRA_BASE_URL=\"$AWS_INFRA_BASE_URL\"-PORT=$API_PORT  -e API_ACCESS_TOKEN=\"$API_ACCESS_TOKEN\" -e DATABASE_URL=\"$DATABASE_URL\" --name \"$CONTAINER_NAME\" --restart always --network writeonce-network $IMAGE_NAME"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker run -d -p $API_PORT:$API_PORT -e AWS_INFRA_BASE_URL=\"$AWS_INFRA_BASE_URL\" -e PORT=$API_PORT  -e API_ACCESS_TOKEN=\"$API_ACCESS_TOKEN\" -e DATABASE_URL=\"$DATABASE_URL\" --name \"$CONTAINER_NAME\" --restart always --network writeonce-network $IMAGE_NAME"
     - ssh-agent -k
   only:
     - main
