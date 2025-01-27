@@ -39,7 +39,7 @@ deploy:
   script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -o StrictHostKeyChecking=no deployer@writeonce.de '
+    - ssh -o -T StrictHostKeyChecking=no deployer@writeonce.de '
         docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
         docker pull $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$IMAGE_NAME:$CI_COMMIT_REF_NAME &&
         docker run -d \
