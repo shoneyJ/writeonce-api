@@ -44,15 +44,7 @@ deploy:
   script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de '
-          docker pull $IMAGE_NAME && \
-          docker run -d \
-            -e AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL \
-            -e PORT=$API_PORT \
-            -e API_ACCESS_TOKEN=$API_ACCESS_TOKEN \
-            -e DATABASE_URL=$DATABASE_URL \
-            --name $CI_PROJECT_NAME-container \
-          $IMAGE_NAME' 
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de 'docker pull $IMAGE_NAME'
     - ssh-agent -k
   only:
     - main
