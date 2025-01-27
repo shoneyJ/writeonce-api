@@ -41,9 +41,9 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de \
         'mkdir -p ~/.docker && echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json'
-    - cd ${WORK_DIR}
 
   script:
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd ${WORK_DIR}"
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker compose -f docker-compose.yml pull"
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker compose -f docker-compose.yml up"
     - ssh-agent -k
