@@ -43,6 +43,7 @@ deploy:
         'mkdir -p ~/.docker && echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json'
 
   script:
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo \"$IMAGE_NAME\" && echo \"TAG\" "
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "export API_IMAGE_NAME=\"$IMAGE_NAME\" && export API_TAG=\"TAG\" "
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml pull"
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml up -d"
