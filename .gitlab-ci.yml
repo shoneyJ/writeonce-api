@@ -43,6 +43,7 @@ deploy:
 
   script:
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker pull \"$IMAGE_NAME\""
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker stop $CI_PROJECT_NAME-container"
     - echo "docker run -d \
       -e AWS_INFRA_BASE_URL=\"$AWS_INFRA_BASE_URL\" \
       -e PORT=\"$API_PORT\" \
