@@ -44,7 +44,7 @@ deploy:
 
   script:
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker pull \"$IMAGE_NAME\""
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo "\$CONTAINER_NAME\""
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo \"$CONTAINER_NAME\""
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo name="\"$CONTAINER_NAME\"""
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de 'docker ps -q -f name=\"$CONTAINER_NAME\" | grep -q . && docker stop \"$CONTAINER_NAME\"'
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de 'docker ps -a -q -f name=\"$CONTAINER_NAME\" | grep -q .&& docker rm \"$CONTAINER_NAME\"'   
