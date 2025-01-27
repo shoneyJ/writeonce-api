@@ -43,10 +43,9 @@ deploy:
         'mkdir -p ~/.docker && echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json'
 
   script:
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo \"$WORK_DIR\""
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\""
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker compose -f docker-compose.yml pull"
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "docker compose -f docker-compose.yml up"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de ""
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml pull"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml up -d"
     - ssh-agent -k
   only:
     - main
