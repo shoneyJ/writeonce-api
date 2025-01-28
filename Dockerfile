@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
 
 
 COPY --from=builder /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
-
+COPY doc /usr/local/share/doc
 
 ENV PORT=$PORT
 ENV AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL
@@ -51,6 +51,8 @@ ENV DATABASE_URL=$DATABASE_URL
 
 # Expose the application port
 EXPOSE ${PORT}
+
+WORKDIR /usr/local/share
 
 # Run the application
 CMD ["app"]
