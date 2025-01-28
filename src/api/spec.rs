@@ -55,13 +55,22 @@ pub async fn swagger_ui() -> impl Responder {
          const token = localStorage.getItem("auth_token");  // Optionally save token in localStorage
         if (token) {
           request.headers['Authorization'] = 'Bearer ' + token;
-        }
+        }else {
+            // Optionally handle the case where no token is available
+            console.log('No token found. Authorization header will not be added.');
+          }
         return request;
       },
       // Add an "Authorize" button to handle token input
       authActions: {
         authorize: (authorize) => {
-          // You can handle custom logic for the "Authorize" button here if needed
+         const token = prompt("Please enter your Bearer token");
+          if (token) {
+              // Save token to localStorage
+              localStorage.setItem("auth_token", token);
+              // Manually trigger the authorization process
+              authorize({ BearerAuth: { token: token } });
+            }
         }
       }
       });
