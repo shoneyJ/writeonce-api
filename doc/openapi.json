@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Article API",
+    "title": "Manage Articles API",
     "version": "1.0.0",
-    "description": "This is a sample API to manage articles."
+    "description": "I manage to the articles with this API, it is open auth token is : 4gX0kZ7hLqF3cW9s7TjD4vH8kB3vY8Qd \n The data is saved in postgres.\n The API is developed in Rust programming language with diesel ORM. \n Images and markdown file are uploaded on AWS S3 bucket. \n The source code is available at https://git.writeonce.de/shoney/writeonce-manage-article-api "
   },
   "security": [
     {
@@ -61,7 +61,191 @@
           }
         }
       }
+    },
+    "/article/": {
+      "post": {
+        "summary": "Create a new Gitlab Runner deployment",
+        "operationId": "createGitlabRunnerDeployment",
+        "requestBody": {
+          "description": "Gitlab Runner deployment configuration",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Gitlab Runner with Kubernetes Executor"
+                  },
+                  "sys_title": {
+                    "type": "string",
+                    "example": "gitlab-runner-with-kubernetes-executor"
+                  },
+                  "published": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "content": {
+                    "type": "object",
+                    "properties": {
+                      "author": {
+                        "type": "string",
+                        "example": "Shoney Arickathil"
+                      },
+                      "content": {
+                        "type": "object",
+                        "properties": {
+                          "codes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "language": {
+                                  "type": "string",
+                                  "example": "yaml"
+                                },
+                                "paragraphIndex": {
+                                  "type": "integer",
+                                  "example": 0
+                                },
+                                "sectionIndex": {
+                                  "type": "integer",
+                                  "example": 1
+                                },
+                                "snippet": {
+                                  "type": "string",
+                                  "example": "gitlab-runnergitlab-runner-deploy/gitlab-runner-with-kubernetes-executor"
+                                },
+                                "title": {
+                                  "type": "string",
+                                  "example": "gitlab runner deploy"
+                                }
+                              }
+                            }
+                          },
+                          "images": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {}
+                            }
+                          },
+                          "img": {
+                            "type": "object",
+                            "properties": {
+                              "caption": {
+                                "type": "string",
+                                "example": "Gitlab runner with kubernetes executor."
+                              },
+                              "path": {
+                                "type": "string",
+                                "example": "https://writeonce-filecloud-bucket.s3.eu-central-1.amazonaws.com/images/kubernetes.png"
+                              }
+                            }
+                          },
+                          "sections": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "heading": {
+                                  "type": "string",
+                                  "example": "Introduction"
+                                },
+                                "paragraphs": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": "Deploying a Gitlab runner using kubernetes is a great option to overcome the limitations of other gitlab runner executor such as docker and docker machine."
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "publishedOn": {
+                        "type": "integer",
+                        "example": 1737414886
+                      },
+                      "references": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "dateAccessed": {
+                              "type": "integer",
+                              "example": 1737414886
+                            },
+                            "title": {
+                              "type": "string",
+                              "example": "Gitlab Kubernetes executor"
+                            },
+                            "url": {
+                              "type": "string",
+                              "example": "https://docs.gitlab.com/runner/executors/kubernetes/"
+                            }
+                          }
+                        }
+                      },
+                      "systitle": {
+                        "type": "string",
+                        "example": "gitlab-runner-with-kubernetes-executor"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "example": ["Kubernetes", "Gitlab runner"]
+                        }
+                      },
+                      "title": {
+                        "type": "string",
+                        "example": "Gitlab Runner with Kubernetes Executor"
+                      }
+                    }
+                  },
+                  "do_aws_sync": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gitlab Runner deployment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Gitlab Runner deployment successfully created."
+                    },
+                    "deploymentId": {
+                      "type": "string",
+                      "example": "abc123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
+  
   },
   "components": {
     "securitySchemes": {
