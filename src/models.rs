@@ -110,6 +110,7 @@ impl Article {
         
         let total_count = articles::table
             .select(count_star()) // Use count_star to count all rows
+            .filter(articles::published.eq(true))
             .first::<i64>(conn)?;
 
             let response = CountResponse { count: total_count };
@@ -124,6 +125,7 @@ impl Article {
        .select((articles::id, articles::title,articles::sys_title, articles::content))
        .limit(limit)
        .offset(skip)
+       .filter(articles::published.eq(true))
        .load::<ArticleContent>(conn)?;
 
         Ok(results)
