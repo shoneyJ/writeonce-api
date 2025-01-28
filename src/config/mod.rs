@@ -21,6 +21,11 @@ pub fn get_server_port() -> u16 {
          .expect("API_ACCESS_TOKEN must be set")
  }
 
+ pub fn get_api_access_admin_token() -> String {    
+    return env::var("API_ACCESS_POST_TOKEN")        
+         .expect("API_ACCESS_POST_TOKEN must be set")
+ }
+
  pub fn get_aws_infra_base_url() -> String {    
     return env::var("AWS_INFRA_BASE_URL")        
          .expect("AWS_INFRA_BASE_URL must be set")

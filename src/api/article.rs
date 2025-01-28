@@ -25,7 +25,7 @@ pub async fn get_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Res
 
 #[delete("/article/{id}")]
 pub async fn remove_article_by_id( req: HttpRequest,id: web::Path<i32>) -> impl Responder {
-    if let Err(response) = valid::validate_token(&req).await {
+    if let Err(response) = valid::validate_admin_token(&req).await {
         return response; // Return Unauthorized response
     }
 
