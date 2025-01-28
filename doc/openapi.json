@@ -18,6 +18,57 @@
     }
   ],
   "paths": {
+    "/article/title/{sys_title}": {
+      "get": {
+        "summary": "Fetch Articles by page route blog title name",
+        "operationId": "getArticleByTitle",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sys_title",
+            "in": "path",
+            "required": true,
+            "description": "Specify the system title of the article",
+            "schema": {
+              "type": "string",
+              "example": "gitlab-runner-with-kubernetes-executor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Articles found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found",
+            "content": {
+              "text/plain": {
+                "example": "Article not found"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "example": "Unauthorized"
+              }
+            }
+          }
+        }
+      }
+    },
     "/articles/{skip}/{limit}": {
       "get": {
         "summary": "Fetch Articles Pagination",
