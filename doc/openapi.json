@@ -1,90 +1,94 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-      "title": "Article API",
-      "version": "1.0.0",
-      "description": "This is a sample API to manage articles."
-    },
-   "security": [
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Article API",
+    "version": "1.0.0",
+    "description": "This is a sample API to manage articles."
+  },
+  "security": [
     {
-      "basicAuth": []
+      "BearerAuth": []
     }
   ],
-    "paths": {
-      "/article/{id}": {
-        "get": {
-          "summary": "Get article by ID",
-          "operationId": "getArticleById",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "The ID of the article to retrieve.",
-              "schema": {
-                "type": "integer",
-                "example": 1
+  "paths": {
+    "/article/{id}": {
+      "get": {
+        "summary": "Get article by ID",
+        "operationId": "getArticleById",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the article to retrieve.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Article found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
               }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "Article found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Article"
-                  }
-                }
+          },
+          "404": {
+            "description": "Article not found",
+            "content": {
+              "text/plain": {
+                "example": "Article not found"
               }
-            },
-            "404": {
-              "description": "Article not found",
-              "content": {
-                "text/plain": {
-                  "example": "Article not found"
-                }
-              }
-            },
-            "401": {
-              "description": "Unauthorized",
-              "content": {
-                "text/plain": {
-                  "example": "Unauthorized"
-                }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "example": "Unauthorized"
               }
             }
           }
         }
       }
-    },
-    "components": {
-      "securitySchemes": {
-      "bearerAuth": {
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
     },
-      "schemas": {
-        "Article": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "example": 1
-            },
-            "title": {
-              "type": "string",
-              "example": "Example Article"
-            },
-            "content": {
-              "type": "string",
-              "example": "This is an example article."
-            }
+    "schemas": {
+      "Article": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Example Article"
+          },
+          "content": {
+            "type": "string",
+            "example": "This is an example article."
           }
         }
       }
     }
   }
-  
+}
