@@ -18,6 +18,67 @@
     }
   ],
   "paths": {
+    "/article/{skip}/{limit}": {
+      "get": {
+        "summary": "Fetch Articles Pagination",
+        "operationId": "getArticleByPage",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "path",
+            "required": true,
+            "description": "The lower range of Article pages",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "required": true,
+            "description": "The limit range of Article pages",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Articles found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found",
+            "content": {
+              "text/plain": {
+                "example": "Article not found"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "example": "Unauthorized"
+              }
+            }
+          }
+        }
+      }
+    },
     "/article/{id}": {
       "get": {
         "summary": "Get article by ID",
