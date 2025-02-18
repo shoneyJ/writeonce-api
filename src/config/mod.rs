@@ -22,7 +22,7 @@ pub fn get_server_port() -> u16 {
  }
 
  pub fn get_api_access_admin_token() -> String {    
-    return env::var("API_ACCESS_POST_TOKEN")        
+    return env::var("API_ACCESS_ADMIN_TOKEN")        
          .expect("API_ACCESS_POST_TOKEN must be set")
  }
 

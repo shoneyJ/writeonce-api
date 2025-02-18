@@ -106,7 +106,7 @@ pub async fn get_articles_pagination(req: HttpRequest,path: web::Path<(i64,i64)>
 
 #[post("/article/")]
 pub async fn upsert( req: HttpRequest, body: web::Json<NewArticle>) -> impl Responder {
-    if let Err(response) = valid::validate_token(&req).await {
+    if let Err(response) = valid::validate_admin_token(&req).await {
         return response; // Return Unauthorized response
     }
     let mut new_article= body.into_inner();
