@@ -45,14 +45,14 @@ deploy:
 
   script:
     - echo $API_PORT
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "export IMAGE_NAME=$IMAGE_NAME; export TAG=$TAG; export API_PORT=$API_PORT; echo \$IMAGE_NAME \$TAG \$API_PORT"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "export IMAGE_NAME=$IMAGE_NAME; export TAG=$TAG; export API_PORT=$API_PORT; &&
 
-        # docker run -d \
-        #   --name writeonce-manage-article-api \
-        #   --network writeonce-network \
-        #   -p $API_PORT:$API_PORT \
-        #   --restart always \
-        #   $IMAGE_NAME:$TAG"
+        docker run -d \
+          --name writeonce-manage-article-api \
+          --network writeonce-network \
+          -p \$API_PORT:\$API_PORT \
+          --restart always \
+          \$IMAGE_NAME:\$TAG"
     - ssh-agent -k
   only:
     - main
