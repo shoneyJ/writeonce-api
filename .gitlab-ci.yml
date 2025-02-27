@@ -35,21 +35,5 @@ deploy:
     - echo "Docker set docker auth config"
     - infra/04-ssh-setup.sh
     - infra/05-deploy.sh
-
-#   script:
-#     - echo $API_PORT
-#     - echo $IMAGE_NAME
-#     - echo $TAG
-#     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-#         IMAGE_NAME=$IMAGE_NAME TAG=$TAG API_PORT=$API_PORT  \
-
-#         docker run -d \
-#           --name writeonce-manage-article-api \
-#           --network writeonce-network \
-#           -p \$API_PORT:\$API_PORT \
-#           --restart always \
-#           \$IMAGE_NAME:\$TAG
-#       "
-#     - ssh-agent -k
-  # only:
-  #   - main
+  only:
+    - main
