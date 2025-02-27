@@ -1,7 +1,7 @@
 stages:
   - build
-  - push
-  - deploy
+  # - push
+  # - deploy
  
 build:
   stage: build
@@ -11,29 +11,29 @@ build:
   before_script:
     - echo "Setting up Docker environment"  
   script:
-    - infra/00-build-image.sh
+    - ./infra/00-build-image.sh
 
-push:
-  stage: push
-  image: docker:20.10.7
-  services:
-    - docker:20.10.7-dind
-  before_script:
-    - echo "Logging into Docker registry"  
-  script:
-    - infra/02-docker-login.sh
-    - infra/03-upload-image.sh
-  only:
-    - main
+# push:
+#   stage: push
+#   image: docker:20.10.7
+#   services:
+#     - docker:20.10.7-dind
+#   before_script:
+#     - echo "Logging into Docker registry"  
+#   script:
+#     - infra/02-docker-login.sh
+#     - infra/03-upload-image.sh
+#   only:
+#     - main
 
-deploy:
-  stage: deploy
-  image: docker:20.10.7
-  services:
-    - docker:20.10.7-dind
-  before_script:
-    - echo "Docker set docker auth config"
-    - infra/04-ssh-setup.sh
-    - infra/05-deploy.sh
-  only:
-    - main
+# deploy:
+#   stage: deploy
+#   image: docker:20.10.7
+#   services:
+#     - docker:20.10.7-dind
+#   before_script:
+#     - echo "Docker set docker auth config"
+#     - infra/04-ssh-setup.sh
+#     - infra/05-deploy.sh
+#   only:
+#     - main
