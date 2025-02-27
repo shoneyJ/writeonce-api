@@ -45,12 +45,13 @@ deploy:
 
   script:
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-        docker run -d \
-          --name writeonce-manage-article-api \
-          --network writeonce-network \
-          -p $API_PORT:$API_PORT \
-          --restart always \
-          $IMAGE_NAME:$TAG"
+        echo \$IMAGE_NAME:\$TAG; 
+        # docker run -d \
+        #   --name writeonce-manage-article-api \
+        #   --network writeonce-network \
+        #   -p $API_PORT:$API_PORT \
+        #   --restart always \
+        #   $IMAGE_NAME:$TAG"
     - ssh-agent -k
   only:
     - main
