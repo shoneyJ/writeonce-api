@@ -45,7 +45,7 @@ deploy:
 
   script:
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-        echo \$IMAGE_NAME:\$TAG; 
+        echo \$IMAGE_NAME:\$TAG:\$API_PORT;" 
         # docker run -d \
         #   --name writeonce-manage-article-api \
         #   --network writeonce-network \
