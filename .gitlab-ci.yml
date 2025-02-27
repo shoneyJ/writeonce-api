@@ -3,19 +3,15 @@ stages:
   - push
   - deploy
  
-variables: 
-  IMAGE_NAME: $CI_REGISTRY_IMAGE
-  TAG: $CI_COMMIT_REF_SLUG
-
-# build:
-#   stage: build
-#   image: docker:20.10.7
-#   services:
-#     - docker:20.10.7-dind
-#   before_script:
-#     - echo "Setting up Docker environment"  
-#   script:
-#     - docker build --build-arg PORT=$API_PORT --build-arg AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL --build-arg DATABASE_URL=$DATABASE_URL --build-arg API_ACCESS_TOKEN=$API_ACCESS_TOKEN --build-arg API_ACCESS_ADMIN_TOKEN=$API_ACCESS_ADMIN_TOKEN -t ${IMAGE_NAME}:${TAG} .
+build:
+  stage: build
+  image: docker:20.10.7
+  services:
+    - docker:20.10.7-dind
+  before_script:
+    - echo "Setting up Docker environment"  
+  script:
+    - infra/00-build-image.sh
 
 push:
   stage: push
@@ -25,8 +21,8 @@ push:
   before_script:
     - echo "Logging into Docker registry"  
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push ${IMAGE_NAME}:${TAG}
+    - infra/02-docker-login.sh
+    - infra/03-upload-image.sh
   only:
     - main
 
@@ -37,26 +33,23 @@ deploy:
     - docker:20.10.7-dind
   before_script:
     - echo "Docker set docker auth config"
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de \
-        'mkdir -p ~/.docker && echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json'
-    - docker pull $IMAGE_NAME:$TAG
+    - infra/04-ssh-setup.sh
+    - infra/05-deploy.sh
 
-  script:
-    - echo $API_PORT
-    - echo $IMAGE_NAME
-    - echo $TAG
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-        IMAGE_NAME=$IMAGE_NAME TAG=$TAG API_PORT=$API_PORT  \
-        
-        docker run -d \
-          --name writeonce-manage-article-api \
-          --network writeonce-network \
-          -p \$API_PORT:\$API_PORT \
-          --restart always \
-          \$IMAGE_NAME:\$TAG
-      "
-    - ssh-agent -k
-  only:
-    - main
+#   script:
+#     - echo $API_PORT
+#     - echo $IMAGE_NAME
+#     - echo $TAG
+#     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
+#         IMAGE_NAME=$IMAGE_NAME TAG=$TAG API_PORT=$API_PORT  \
+
+#         docker run -d \
+#           --name writeonce-manage-article-api \
+#           --network writeonce-network \
+#           -p \$API_PORT:\$API_PORT \
+#           --restart always \
+#           \$IMAGE_NAME:\$TAG
+#       "
+#     - ssh-agent -k
+  # only:
+  #   - main
