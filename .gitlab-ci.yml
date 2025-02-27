@@ -1,7 +1,3 @@
-before_script:
-  - echo "Global setup before script"
-  - chmod +x ./infra/*
-  - ls -l ./infra/
 stages:
   - build
   # - push
@@ -13,7 +9,9 @@ build:
   services:
     - docker:20.10.7-dind
   before_script:
-    - echo "Setting up Docker environment"  
+    - echo "Global setup before script"
+    - chmod +x ./infra/*
+    - ls -l ./infra/
   script:
     - ./infra/00-build-image.sh
 
