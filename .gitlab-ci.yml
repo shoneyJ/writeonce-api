@@ -1,3 +1,7 @@
+before_script:
+  - echo "Global setup before script"
+  - chmod +x ./infra/*
+  - ls -l ./infra/
 stages:
   - build
   # - push
