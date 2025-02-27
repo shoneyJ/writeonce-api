@@ -48,9 +48,9 @@ deploy:
         docker run -d \
           --name writeonce-manage-article-api \
           --network writeonce-network \
-          -p $PORT:$PORT \
+          -p $API_PORT:$API_PORT \
           --restart always \
-          ${IMAGE_NAME}:${TAG}"
+          $IMAGE_NAME:$TAG"
     - ssh-agent -k
   only:
     - main
