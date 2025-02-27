@@ -44,8 +44,9 @@ deploy:
     - docker pull $IMAGE_NAME:$TAG
 
   script:
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-        echo \$IMAGE_NAME \$TAG \$API_PORT" 
+    - echo $API_PORT
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "export IMAGE_NAME=$IMAGE_NAME; export TAG=$TAG; export API_PORT=$API_PORT; echo \$IMAGE_NAME \$TAG \$API_PORT"
+
         # docker run -d \
         #   --name writeonce-manage-article-api \
         #   --network writeonce-network \
