@@ -45,19 +45,18 @@ deploy:
 
   script:
     - echo $API_PORT
+    - echo $IMAGE_NAME
+    - echo $TAG
     - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
-        bash -l -c ' 
-          export IMAGE_NAME=$IMAGE_NAME; \
-          export TAG=$TAG; \
-          export API_PORT=$API_PORT; \
-
-          docker run -d \
-            --name writeonce-manage-article-api \
-            --network writeonce-network \
-            -p \$API_PORT:\$API_PORT \
-            --restart always \
-            \$IMAGE_NAME:\$TAG
-        '"
+        IMAGE_NAME=$IMAGE_NAME TAG=$TAG API_PORT=$API_PORT  \
+        
+        docker run -d \
+          --name writeonce-manage-article-api \
+          --network writeonce-network \
+          -p \$API_PORT:\$API_PORT \
+          --restart always \
+          \$IMAGE_NAME:\$TAG
+      "
     - ssh-agent -k
   only:
     - main
