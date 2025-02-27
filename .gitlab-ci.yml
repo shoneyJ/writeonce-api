@@ -14,8 +14,7 @@ build:
   before_script:
     - echo "Setting up Docker environment"  
   script:
-    - docker info  # Verify Docker is running
-    - docker build -t ${IMAGE_NAME}:${TAG} .
+    - docker build --build-arg PORT=$API_PORT --build-arg AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL --build-arg DATABASE_URL=$DATABASE_URL --build-arg API_ACCESS_TOKEN=$API_ACCESS_TOKEN --build-arg API_ACCESS_ADMIN_TOKEN=$API_ACCESS_ADMIN_TOKEN -t ${IMAGE_NAME}:${TAG} .
 
 push:
   stage: push
@@ -43,10 +42,14 @@ deploy:
         'mkdir -p ~/.docker && echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json'
 
   script:
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "echo \"$IMAGE_NAME\" && echo \"TAG\" "
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "export API_IMAGE_NAME=\"$IMAGE_NAME\" && export API_TAG=\"TAG\" "
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml pull"
-    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "cd \"$WORK_DIR\" && docker compose -f docker-compose.yml up -d"
+    - ssh -T -o StrictHostKeyChecking=no deployer@writeonce.de "
+        docker run -d \
+          --name writeonce-manage-article-api \
+          --network writeonce-network \
+          -p $PORT:$PORT \
+          --restart always \
+          ${IMAGE_NAME}:${TAG}
+      "
     - ssh-agent -k
   only:
     - main
