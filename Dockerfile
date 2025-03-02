@@ -6,10 +6,6 @@ ARG API_ACCESS_TOKEN
 ARG API_ACCESS_ADMIN_TOKEN
 ARG VERSION=1.82.0
 
-RUN echo "Global" 
-RUN echo ${VERSION}
-RUN echo ${PORT}
-
 FROM rust:${VERSION} AS base
 WORKDIR /usr/src/app
 
