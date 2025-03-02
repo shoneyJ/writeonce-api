@@ -2,6 +2,7 @@
 
 if [ -z "$API_PORT" ] || [ -z "$AWS_INFRA_BASE_URL" ] || [ -z "$DATABASE_URL" ] || [ -z "$API_ACCESS_TOKEN" ] || [ -z "$API_ACCESS_ADMIN_TOKEN" ]; then
   echo "Error: Missing required environment variables"
+  echo "$API_PORT"
   exit 1
 fi
 
