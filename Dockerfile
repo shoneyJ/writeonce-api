@@ -1,14 +1,18 @@
-# Stage 1: Build the Rust application
-FROM rust:1.82.0 AS build
-WORKDIR /usr/src/app
-
+# Declare ARG in global scope
 ARG PORT
 ARG AWS_INFRA_BASE_URL
 ARG DATABASE_URL
 ARG API_ACCESS_TOKEN
 ARG API_ACCESS_ADMIN_TOKEN
+ARG VERSION=1.82.0
+
+FROM rust:${VERSION} AS base
+WORKDIR /usr/src/app
+
+FROM base as build
 
 # Install build dependencies
+
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -44,6 +48,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
 COPY doc /usr/local/share/doc
+
+RUN echo $PORT
 
 ENV PORT=$PORT
 ENV AWS_INFRA_BASE_URL=$AWS_INFRA_BASE_URL
