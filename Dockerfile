@@ -1,5 +1,5 @@
 # Stage 1: Build the Rust application
-FROM rust:1.82.0 AS builder
+FROM rust:1.82.0 AS build
 WORKDIR /usr/src/app
 
 ARG PORT
@@ -32,7 +32,7 @@ COPY . .
 RUN cargo build --release
 
 # Stage 2: Create a minimal runtime image
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim as runtime
 
 # Install necessary runtime dependencies
 RUN apt-get update && apt-get install -y \
