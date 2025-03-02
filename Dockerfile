@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-COPY --from=builder /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
+COPY --from=build /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
 COPY doc /usr/local/share/doc
 
 ENV PORT=$PORT
