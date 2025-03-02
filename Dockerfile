@@ -1,9 +1,4 @@
 # Declare ARG in global scope
-ARG PORT
-ARG AWS_INFRA_BASE_URL
-ARG DATABASE_URL
-ARG API_ACCESS_TOKEN
-ARG API_ACCESS_ADMIN_TOKEN
 ARG VERSION=1.82.0
 
 FROM rust:${VERSION} AS base
@@ -48,7 +43,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
 COPY doc /usr/local/share/doc
+
 ARG PORT
+ARG AWS_INFRA_BASE_URL
+ARG DATABASE_URL
+ARG API_ACCESS_TOKEN
+ARG API_ACCESS_ADMIN_TOKEN
 RUN echo $PORT
 
 ENV PORT=$PORT
