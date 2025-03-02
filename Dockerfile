@@ -6,6 +6,8 @@ ARG API_ACCESS_TOKEN
 ARG API_ACCESS_ADMIN_TOKEN
 ARG VERSION=1.82.0
 
+RUN echo "Global" ${PORT}
+
 FROM rust:${VERSION} AS base
 WORKDIR /usr/src/app
 
@@ -48,7 +50,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /usr/src/app/target/release/writeonce-manage-article-api /usr/local/bin/app
 COPY doc /usr/local/share/doc
-
+ARG PORT
 RUN echo $PORT
 
 ENV PORT=$PORT
