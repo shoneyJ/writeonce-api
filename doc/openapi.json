@@ -9,7 +9,7 @@
     "host": "api.writeonce.de",
     "version": "0.0.1",
     "summary": "Blog manage API",
-    "description":  "WriteOnce API server. Source code available at  [GitLab](https://git.writeonce.de/shoney/writeonce-manage-article-api). Except for POST request, you can use the API key `4gX0kZ7hLqF3cW9s7TjD4vH8kB3vY8Qd` to test the authorization filters."
+    "description":  "🚀 **WriteOnce API Server**\n\nSource code available on [GitLab](https://git.writeonce.de/shoney/writeonce-manage-article-api).\n\n🔐 **Authorization:**\nYou can use the API key `4gX0kZ7hLqF3cW9s7TjD4vH8kB3vY8Qd` to test the authorization filters (except for POST requests).\n\n📦 **S3 + AWS Lambda Integration:**\nWhen JSON documents are saved to an S3 bucket, an AWS Lambda function is triggered automatically. This function then makes a POST request to this API endpoint to create a new article.\n\n💡 View the [AWS Lambda function code](https://git.writeonce.de/shoney/writeonce-function)."
     
   },
   "security": [
