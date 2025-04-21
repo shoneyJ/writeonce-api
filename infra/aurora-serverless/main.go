@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/rds"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -8,7 +10,7 @@ import (
 
 func vpc(ctx *pulumi.Context) (*ec2.Vpc, error) {
 
-	return ec2.NewVpc(ctx, "writeonce-aurora-vpc", &ec2.VpcArgs{
+	return ec2.NewVpc(ctx, "writeonce-vpc", &ec2.VpcArgs{
 		CidrBlock:       pulumi.String("10.0.0.0/16"),
 		InstanceTenancy: pulumi.String("default"),
 		Tags: pulumi.StringMap{
@@ -27,7 +29,7 @@ func securityGroup(ctx *pulumi.Context, vpc *ec2.Vpc) (*ec2.SecurityGroup, error
 				Protocol:   pulumi.String("tcp"),
 				FromPort:   pulumi.Int(5432),
 				ToPort:     pulumi.Int(5432),
-				CidrBlocks: pulumi.StringArray{pulumi.String("0.0.0.0/0")},
+				CidrBlocks: pulumi.StringArray{vpc.CidrBlock},
 			},
 		},
 		Egress: ec2.SecurityGroupEgressArray{
@@ -84,26 +86,24 @@ func cluster(ctx *pulumi.Context, sg *ec2.SecurityGroup, subnets []*ec2.Subnet) 
 	}
 
 	result, err := rds.NewCluster(ctx, "postgresql", &rds.ClusterArgs{
-		ClusterIdentifier: pulumi.String("aurora-cluster-demo"),
+		ClusterIdentifier: pulumi.String("aurora-cluster"),
 		Engine:            pulumi.String(rds.EngineTypeAuroraPostgresql),
 		EngineMode:        pulumi.String(rds.EngineModeProvisioned),
 		EngineVersion:     pulumi.String("16.6"),
-		DatabaseName:   pulumi.String("writeonce"),
-		MasterUsername: pulumi.String("writeonce"),
-		MasterPassword: pulumi.String("writeonce"),
+		DatabaseName:      pulumi.String("writeonce"),
+		MasterUsername:    pulumi.String("writeonce"),
+		MasterPassword:    pulumi.String("writeonce"),
 		VpcSecurityGroupIds: pulumi.StringArray{
 			sg.ID().ToStringOutput(),
 		},
 		DbSubnetGroupName: subnetGroup.Name,
 		StorageEncrypted:  pulumi.Bool(true),
 		Serverlessv2ScalingConfiguration: &rds.ClusterServerlessv2ScalingConfigurationArgs{
-			MaxCapacity: pulumi.Float64(1),
-			MinCapacity: pulumi.Float64(0.5),
+			MaxCapacity:           pulumi.Float64(1),
+			MinCapacity:           pulumi.Float64(0),
 			SecondsUntilAutoPause: pulumi.Int(3600),
-			
-
 		},
-		
+		SkipFinalSnapshot: pulumi.Bool(true),
 	})
 	if err != nil {
 		return nil, err
@@ -113,7 +113,6 @@ func cluster(ctx *pulumi.Context, sg *ec2.SecurityGroup, subnets []*ec2.Subnet) 
 		InstanceClass:     pulumi.String("db.serverless"),
 		Engine:            result.Engine,
 		EngineVersion:     result.EngineVersion,
-		
 	})
 	if err != nil {
 		return nil, err
@@ -124,35 +123,47 @@ func cluster(ctx *pulumi.Context, sg *ec2.SecurityGroup, subnets []*ec2.Subnet) 
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		deploymentType := os.Getenv("DEPLOYMENT_TYPE")
 
-		vpc, err := vpc(ctx)
-		if err != nil {
-			return err
+		if deploymentType == "aurora" {
+			vpc, err := vpc(ctx)
+			if err != nil {
+				return err
+			}
+
+			sg, err := securityGroup(ctx, vpc)
+			if err != nil {
+				return err
+			}
+
+			subA, err := subnetA(ctx, vpc)
+			if err != nil {
+				return err
+			}
+			subB, err := subnetB(ctx, vpc)
+			if err != nil {
+				return err
+			}
+
+			cluster, err := cluster(ctx, sg, []*ec2.Subnet{subA, subB})
+			if err != nil {
+				return err
+			}
+
+			ctx.Export("vpcId", vpc.ID())
+			ctx.Export("securityGroupId", sg.ID())
+			ctx.Export("clusterEndpoint", cluster.Endpoint)
+
+			return nil
+		} else if deploymentType == "lambda" {
+			// Deploy Lambda
+			_, err := lambdaFunction(ctx)
+			if err != nil {
+				return err
+			}
+
+			ctx.Export("lambdaFunction", pulumi.String("example-lambda"))
 		}
-
-		sg, err := securityGroup(ctx, vpc)
-		if err != nil {
-			return err
-		}
-
-		subA, err := subnetA(ctx, vpc)
-		if err != nil {
-			return err
-		}
-		subB, err := subnetB(ctx, vpc)
-		if err != nil {
-			return err
-		}
-
-		cluster, err := cluster(ctx, sg, []*ec2.Subnet{subA, subB})
-		if err != nil {
-			return err
-		}
-
-		ctx.Export("vpcId", vpc.ID())
-		ctx.Export("securityGroupId", sg.ID())
-		ctx.Export("clusterEndpoint", cluster.Endpoint)
-
 		return nil
 
 	})

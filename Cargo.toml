@@ -7,6 +7,10 @@ edition = "2021"
 name = "writeonce-manage-article-api"
 path = "src/main.rs"
 
+[[bin]]
+name = "lambda-post-article"
+path = "src/lambda/post_article.rs"
+
 [dependencies]
 actix-web = "4.0"
 warp = "0.3"
