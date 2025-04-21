@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
-
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/lambda"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/rds"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -121,49 +121,148 @@ func cluster(ctx *pulumi.Context, sg *ec2.SecurityGroup, subnets []*ec2.Subnet) 
 
 }
 
+func lambdaFunction(ctx *pulumi.Context, cluster *rds.Cluster, securityGroup *ec2.SecurityGroup, subnets []*ec2.Subnet) error {
+
+	subnetIds := pulumi.StringArray{}
+	for _, s := range subnets {
+		subnetIds = append(subnetIds, s.ID())
+	}
+	
+	layer, err := lambda.NewLayerVersion(ctx, "pg_libpq-layer", &lambda.LayerVersionArgs{
+		Code:      pulumi.NewFileArchive("layer/libpq-layer.zip"),
+		LayerName: pulumi.String("libpq-layer"),
+		CompatibleRuntimes: pulumi.StringArray{
+			pulumi.String("provided.al2023"),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	// Create an IAM role.
+	role, err := iam.NewRole(ctx, "task-exec-role", &iam.RoleArgs{
+		AssumeRolePolicy: pulumi.String(`{
+				"Version": "2012-10-17",
+				"Statement": [{
+					"Sid": "",
+					"Effect": "Allow",
+					"Principal": {
+						"Service": "lambda.amazonaws.com"
+					},
+					"Action": "sts:AssumeRole"
+				}]
+			}`),
+	})
+	if err != nil {
+		return err
+	}
+
+	// change later
+	funcPolicy, err := iam.NewRolePolicy(ctx, "post-article-aurora-pgsql-policy", &iam.RolePolicyArgs{
+		Role: role.Name,
+		Policy: pulumi.String(`{
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Action": [
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents"
+                    ],
+                    "Resource": "arn:aws:logs:*:*:*"
+                }, 
+				{
+					"Effect": "Allow",
+					"Action": [
+						"ec2:CreateNetworkInterface",
+						"ec2:DescribeNetworkInterfaces",
+						"ec2:DeleteNetworkInterface"
+					],
+					"Resource": "*"
+					},
+				{
+           			 "Effect": "Allow",
+            		"Action": [
+                		"rds-db:connect",
+        				"secretsmanager:GetSecretValue"
+            		],
+            		"Resource": "*"
+        		}]
+            }`),
+	})
+	if err != nil {
+		return err
+	}
+
+	// Set arguments for constructing the function resource.
+	args := &lambda.FunctionArgs{
+		Handler: pulumi.String("bootstrap"),
+		Role:    role.Arn,
+		Runtime: pulumi.String("provided.al2023"),
+		Code:    pulumi.NewFileArchive("../../target/lambda/lambda-post-article/bootstrap.zip"),
+		Environment: &lambda.FunctionEnvironmentArgs{
+			Variables: pulumi.StringMap{
+				"DATABASE_URL": cluster.Endpoint,
+			},
+		},
+		VpcConfig: &lambda.FunctionVpcConfigArgs{
+			SecurityGroupIds: pulumi.StringArray{
+				securityGroup.ID(),
+			},
+			SubnetIds: subnetIds,
+		},
+		Layers: pulumi.StringArray{
+			layer.Arn,
+		},
+	}
+
+	// Create the lambda using the args.
+	function, err := lambda.NewFunction(
+		ctx,
+		"post-article-aurora-pgsql-function",
+		args,
+		pulumi.DependsOn([]pulumi.Resource{funcPolicy}),
+	)
+	if err != nil {
+		return err
+	}
+	// Export the lambda ARN.
+	ctx.Export("lambda", function.Arn)
+
+	return nil
+
+}
+
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		deploymentType := os.Getenv("DEPLOYMENT_TYPE")
 
-		if deploymentType == "aurora" {
-			vpc, err := vpc(ctx)
-			if err != nil {
-				return err
-			}
-
-			sg, err := securityGroup(ctx, vpc)
-			if err != nil {
-				return err
-			}
-
-			subA, err := subnetA(ctx, vpc)
-			if err != nil {
-				return err
-			}
-			subB, err := subnetB(ctx, vpc)
-			if err != nil {
-				return err
-			}
-
-			cluster, err := cluster(ctx, sg, []*ec2.Subnet{subA, subB})
-			if err != nil {
-				return err
-			}
-
-			ctx.Export("vpcId", vpc.ID())
-			ctx.Export("securityGroupId", sg.ID())
-			ctx.Export("clusterEndpoint", cluster.Endpoint)
-
-			return nil
-		} else if deploymentType == "lambda" {
-			// Deploy Lambda
-			_, err := lambdaFunction(ctx)
-			if err != nil {
-				return err
-			}
-
-			ctx.Export("lambdaFunction", pulumi.String("example-lambda"))
+		vpc, err := vpc(ctx)
+		if err != nil {
+			return err
 		}
+
+		sg, err := securityGroup(ctx, vpc)
+		if err != nil {
+			return err
+		}
+
+		subA, err := subnetA(ctx, vpc)
+		if err != nil {
+			return err
+		}
+		subB, err := subnetB(ctx, vpc)
+		if err != nil {
+			return err
+		}
+
+		cluster, err := cluster(ctx, sg, []*ec2.Subnet{subA, subB})
+		if err != nil {
+			return err
+		}
+		lambdaFunction(ctx, cluster, sg, []*ec2.Subnet{subA, subB})
+		ctx.Export("vpcId", vpc.ID())
+		ctx.Export("securityGroupId", sg.ID())
+		ctx.Export("clusterEndpoint", cluster.Endpoint)
+
 		return nil
 
 	})
