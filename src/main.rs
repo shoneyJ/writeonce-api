@@ -1,13 +1,7 @@
 use actix_web::{App, HttpServer};
-pub mod services;
-pub mod error_handler;
-pub mod db;
-pub mod schema;
-pub mod models;
-
-
-mod api;
-mod config;
+use writeonce_manage_article_api::db;
+use writeonce_manage_article_api::api;
+use writeonce_manage_article_api::config;
 
 
 

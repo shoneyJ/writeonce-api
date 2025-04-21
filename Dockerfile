@@ -28,7 +28,7 @@ RUN cargo build --release && rm -rf target/release/deps/*
 
 COPY . .
 
-RUN cargo build --release
+RUN cargo build --release --bin writeonce-manage-article-api
 
 # Stage 2: Create a minimal runtime image
 FROM debian:bookworm-slim as runtime

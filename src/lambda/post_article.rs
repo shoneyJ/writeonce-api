@@ -1,6 +1,4 @@
-use crate::api::valid;
-use crate::models::*;
-use crate::services::aws::get_s3_article;
+use writeonce_manage_article_api::models::*;
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use serde_json::{json, Value};
 
@@ -18,18 +16,21 @@ async fn handler(event: LambdaEvent<Value>) -> Result<Value, Error> {
     };
 
     match Article::upsert(new_article) {
-        Ok(article) => Ok(json!({
-            "status": "success",
-            "message": "Article saved",
-            "article": article
-        })),
-        Err(err) => Ok(json!({
-            "status": "error",
-            "message": format!("Failed to save article: {}", err)
-        })),
-    }
+        Ok(article) => {
 
-    Ok(json!({ "message": format!("Article Saved") }))
+            return Ok(json!({
+                "status": "success",
+                "data": article
+            }));
+        },
+        Err(err) =>{
+            return Ok(json!({
+                "status": "error",
+                "message": format!("Invalid payload: {}", err)
+            }));
+
+        }
+    }
 }
 
 #[tokio::main]
