@@ -30,3 +30,24 @@ pub fn get_server_port() -> u16 {
     return env::var("AWS_INFRA_BASE_URL")        
          .expect("AWS_INFRA_BASE_URL must be set")
  }
+
+pub fn get_aws_region() -> String {    
+   return env::var("AWS_REGION")        
+        .expect("AWS_REGION must be set")
+}
+
+pub fn get_aws_acess_key_id() -> String {    
+    return env::var("AWS_ACCESS_KEY_ID")        
+         .expect("AWS_ACCESS_KEY_ID must be set")
+ }
+
+ pub fn get_aws_secret_acess_key_id() -> String {    
+    return env::var("AWS_SECRET_ACCESS_KEY")        
+         .expect("AWS_SECRET_ACCESS_KEY must be set")
+ }
+
+ pub fn get_aws_bucket_name() -> String {    
+    return env::var("AWS_BUCKET_NAME")        
+         .expect("AWS_BUCKET_NAME must be set")
+ }
+

@@ -13,13 +13,16 @@ pub async fn get_s3_article(sys_title: String) -> Result<Value, CustomError> {
     let url = base_url.join(&format!("/article/{}", sys_title)).unwrap();
 
     let response = client
-    .get(url)
-    .bearer_auth(token)
-    .send()
-    .await
-    .map_err(CustomError::from_request_error)?;
+        .get(url)
+        .bearer_auth(token)
+        .send()
+        .await
+        .map_err(CustomError::from_request_error)?;
 
-    let json_value = response.json().await.map_err(CustomError::from_request_error)?;
-       
+    let json_value = response
+        .json()
+        .await
+        .map_err(CustomError::from_request_error)?;
+
     Ok(json_value)
 }
